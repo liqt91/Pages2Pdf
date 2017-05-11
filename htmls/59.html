@@ -1,0 +1,77 @@
+
+        <html>
+            <head></head>
+            <body>
+                <div class="x-wiki-content">
+<center><h1>操作文件和目录</h1></center><p>如果我们要操作文件、目录，可以在命令行下面输入操作系统提供的各种命令来完成。比如<code>dir</code>、<code>cp</code>等命令。</p>
+<p>如果要在Python程序中执行这些目录和文件的操作怎么办？其实操作系统提供的命令只是简单地调用了操作系统提供的接口函数，Python内置的<code>os</code>模块也可以直接调用操作系统提供的接口函数。</p>
+<p>打开Python交互式命令行，我们来看看如何使用<code>os</code>模块的基本功能：</p>
+<pre><code>&gt;&gt;&gt; import os
+&gt;&gt;&gt; os.name # 操作系统类型
+'posix'
+</code></pre><p>如果是<code>posix</code>，说明系统是<code>Linux</code>、<code>Unix</code>或<code>Mac OS X</code>，如果是<code>nt</code>，就是<code>Windows</code>系统。</p>
+<p>要获取详细的系统信息，可以调用<code>uname()</code>函数：</p>
+<pre><code>&gt;&gt;&gt; os.uname()
+posix.uname_result(sysname='Darwin', nodename='MichaelMacPro.local', release='14.3.0', version='Darwin Kernel Version 14.3.0: Mon Mar 23 11:59:05 PDT 2015; root:xnu-2782.20.48~5/RELEASE_X86_64', machine='x86_64')
+</code></pre><p>注意<code>uname()</code>函数在Windows上不提供，也就是说，<code>os</code>模块的某些函数是跟操作系统相关的。</p>
+<h3 id="-">环境变量</h3>
+<p>在操作系统中定义的环境变量，全部保存在<code>os.environ</code>这个变量中，可以直接查看：</p>
+<pre><code>&gt;&gt;&gt; os.environ
+environ({'VERSIONER_PYTHON_PREFER_32_BIT': 'no', 'TERM_PROGRAM_VERSION': '326', 'LOGNAME': 'michael', 'USER': 'michael', 'PATH': '/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/opt/X11/bin:/usr/local/mysql/bin', ...})
+</code></pre><p>要获取某个环境变量的值，可以调用<code>os.environ.get('key')</code>：</p>
+<pre><code>&gt;&gt;&gt; os.environ.get('PATH')
+'/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/opt/X11/bin:/usr/local/mysql/bin'
+&gt;&gt;&gt; os.environ.get('x', 'default')
+'default'
+</code></pre><h3 id="-">操作文件和目录</h3>
+<p>操作文件和目录的函数一部分放在<code>os</code>模块中，一部分放在<code>os.path</code>模块中，这一点要注意一下。查看、创建和删除目录可以这么调用：</p>
+<pre><code># 查看当前目录的绝对路径:
+&gt;&gt;&gt; os.path.abspath('.')
+'/Users/michael'
+# 在某个目录下创建一个新目录，首先把新目录的完整路径表示出来:
+&gt;&gt;&gt; os.path.join('/Users/michael', 'testdir')
+'/Users/michael/testdir'
+# 然后创建一个目录:
+&gt;&gt;&gt; os.mkdir('/Users/michael/testdir')
+# 删掉一个目录:
+&gt;&gt;&gt; os.rmdir('/Users/michael/testdir')
+</code></pre><p>把两个路径合成一个时，不要直接拼字符串，而要通过<code>os.path.join()</code>函数，这样可以正确处理不同操作系统的路径分隔符。在Linux/Unix/Mac下，<code>os.path.join()</code>返回这样的字符串：</p>
+<pre><code>part-1/part-2
+</code></pre><p>而Windows下会返回这样的字符串：</p>
+<pre><code>part-1\part-2
+</code></pre><p>同样的道理，要拆分路径时，也不要直接去拆字符串，而要通过<code>os.path.split()</code>函数，这样可以把一个路径拆分为两部分，后一部分总是最后级别的目录或文件名：</p>
+<pre><code>&gt;&gt;&gt; os.path.split('/Users/michael/testdir/file.txt')
+('/Users/michael/testdir', 'file.txt')
+</code></pre><p><code>os.path.splitext()</code>可以直接让你得到文件扩展名，很多时候非常方便：</p>
+<pre><code>&gt;&gt;&gt; os.path.splitext('/path/to/file.txt')
+('/path/to/file', '.txt')
+</code></pre><p>这些合并、拆分路径的函数并不要求目录和文件要真实存在，它们只对字符串进行操作。</p>
+<p>文件操作使用下面的函数。假定当前目录下有一个<code>test.txt</code>文件：</p>
+<pre><code># 对文件重命名:
+&gt;&gt;&gt; os.rename('test.txt', 'test.py')
+# 删掉文件:
+&gt;&gt;&gt; os.remove('test.py')
+</code></pre><p>但是复制文件的函数居然在<code>os</code>模块中不存在！原因是复制文件并非由操作系统提供的系统调用。理论上讲，我们通过上一节的读写文件可以完成文件复制，只不过要多写很多代码。</p>
+<p>幸运的是<code>shutil</code>模块提供了<code>copyfile()</code>的函数，你还可以在<code>shutil</code>模块中找到很多实用函数，它们可以看做是<code>os</code>模块的补充。</p>
+<p>最后看看如何利用Python的特性来过滤文件。比如我们要列出当前目录下的所有目录，只需要一行代码：</p>
+<pre><code>&gt;&gt;&gt; [x for x in os.listdir('.') if os.path.isdir(x)]
+['.lein', '.local', '.m2', '.npm', '.ssh', '.Trash', '.vim', 'Applications', 'Desktop', ...]
+</code></pre><p>要列出所有的<code>.py</code>文件，也只需一行代码：</p>
+<pre><code>&gt;&gt;&gt; [x for x in os.listdir('.') if os.path.isfile(x) and os.path.splitext(x)[1]=='.py']
+['apis.py', 'config.py', 'models.py', 'pymonitor.py', 'test_db.py', 'urls.py', 'wsgiapp.py']
+</code></pre><p>是不是非常简洁？</p>
+<h3 id="-">小结</h3>
+<p>Python的<code>os</code>模块封装了操作系统的目录和文件操作，要注意这些函数有的在<code>os</code>模块中，有的在<code>os.path</code>模块中。</p>
+<h3 id="-">练习</h3>
+<ol>
+<li><p>利用<code>os</code>模块编写一个能实现<code>dir -l</code>输出的程序。</p>
+</li>
+<li><p>编写一个程序，能在当前目录以及当前目录的所有子目录下查找文件名包含指定字符串的文件，并打印出相对路径。</p>
+</li>
+</ol>
+<h3 id="-">参考源码</h3>
+<p><a href="https://github.com/michaelliao/learn-python3/blob/master/samples/io/do_dir.py">do_dir</a></p>
+</div>
+            </body>
+        </html>
+    

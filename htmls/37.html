@@ -1,0 +1,42 @@
+
+        <html>
+            <head></head>
+            <body>
+                <div class="x-wiki-content">
+<center><h1>安装第三方模块</h1></center><p>在Python中，安装第三方模块，是通过包管理工具pip完成的。</p>
+<p>如果你正在使用Mac或Linux，安装pip本身这个步骤就可以跳过了。</p>
+<p>如果你正在使用Windows，请参考<a href="/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/0014316090478912dab2a3a9e8f4ed49d28854b292f85bb000">安装Python</a>一节的内容，确保安装时勾选了<code>pip</code>和<code>Add python.exe to Path</code>。</p>
+<p>在命令提示符窗口下尝试运行<code>pip</code>，如果Windows提示未找到命令，可以重新运行安装程序添加<code>pip</code>。</p>
+<p>注意：Mac或Linux上有可能并存Python 3.x和Python 2.x，因此对应的pip命令是<code>pip3</code>。</p>
+<p>现在，让我们来安装一个第三方库——Python Imaging Library，这是Python下非常强大的处理图像的工具库。不过，PIL目前只支持到Python 2.7，并且有年头没有更新了，因此，基于PIL的Pillow项目开发非常活跃，并且支持最新的Python 3。</p>
+<p>一般来说，第三方库都会在Python官方的<a href="https://pypi.python.org/">pypi.python.org</a>网站注册，要安装一个第三方库，必须先知道该库的名称，可以在官网或者pypi上搜索，比如Pillow的名称叫<a href="https://pypi.python.org/pypi/Pillow/">Pillow</a>，因此，安装Pillow的命令就是：</p>
+<pre><code>pip install Pillow
+</code></pre><p>耐心等待下载并安装后，就可以使用Pillow了。</p>
+<p>有了Pillow，处理图片易如反掌。随便找个图片生成缩略图：</p>
+<pre><code>&gt;&gt;&gt; from PIL import Image
+&gt;&gt;&gt; im = Image.open('test.png')
+&gt;&gt;&gt; print(im.format, im.size, im.mode)
+PNG (400, 300) RGB
+&gt;&gt;&gt; im.thumbnail((200, 100))
+&gt;&gt;&gt; im.save('thumb.jpg', 'JPEG')
+</code></pre><p>其他常用的第三方库还有MySQL的驱动：<code>mysql-connector-python</code>，用于科学计算的NumPy库：<code>numpy</code>，用于生成文本的模板工具<code>Jinja2</code>，等等。</p>
+<h3 id="-">模块搜索路径</h3>
+<p>当我们试图加载一个模块时，Python会在指定的路径下搜索对应的.py文件，如果找不到，就会报错：</p>
+<pre><code>&gt;&gt;&gt; import mymodule
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+ImportError: No module named mymodule
+</code></pre><p>默认情况下，Python解释器会搜索当前目录、所有已安装的内置模块和第三方模块，搜索路径存放在<code>sys</code>模块的<code>path</code>变量中：</p>
+<pre><code>&gt;&gt;&gt; import sys
+&gt;&gt;&gt; sys.path
+['', '/Library/Frameworks/Python.framework/Versions/3.4/lib/python34.zip', '/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4', '/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/plat-darwin', '/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/lib-dynload', '/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/site-packages']
+</code></pre><p>如果我们要添加自己的搜索目录，有两种方法：</p>
+<p>一是直接修改<code>sys.path</code>，添加要搜索的目录：</p>
+<pre><code>&gt;&gt;&gt; import sys
+&gt;&gt;&gt; sys.path.append('/Users/michael/my_py_scripts')
+</code></pre><p>这种方法是在运行时修改，运行结束后失效。</p>
+<p>第二种方法是设置环境变量<code>PYTHONPATH</code>，该环境变量的内容会被自动添加到模块搜索路径中。设置方式与设置Path环境变量类似。注意只需要添加你自己的搜索路径，Python自己本身的搜索路径不受影响。</p>
+</div>
+            </body>
+        </html>
+    
